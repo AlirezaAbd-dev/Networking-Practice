@@ -14,6 +14,10 @@ server.on("connection", (socket) => {
   });
 
   clients.push(socket);
+
+  socket.on("error", (err) => {
+    console.log("one connection closed!");
+  });
 });
 
 server.listen(3008, "127.0.0.1", () => {
