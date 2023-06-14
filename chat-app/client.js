@@ -39,10 +39,12 @@ const socket = net.createConnection(
     ask();
 
     socket.on("data", async (data) => {
+      // log an empty line
       console.log();
+      //   move the cursor one line up
       await moveCursor(0, -1);
+      //   clear that line
       await clearLine(0);
-
       console.log(data.toString("utf-8"));
 
       ask();
@@ -50,6 +52,11 @@ const socket = net.createConnection(
   }
 );
 
-socket.on("end", () => {
+socket.on("error", async () => {
+  console.log();
+  await moveCursor(0, -1);
+  await clearLine(0);
   console.log("Connection was ended!");
+
+  process.exit(0);
 });
