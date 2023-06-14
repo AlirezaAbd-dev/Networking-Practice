@@ -16,6 +16,10 @@ const socket = net.createConnection(
   }
 );
 
+socket.on("data", (data) => {
+  console.log(data.toString("utf-8"));
+});
+
 socket.on("end", () => {
   console.log("Connection was ended!");
 });
