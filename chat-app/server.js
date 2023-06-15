@@ -7,13 +7,21 @@ const clients = [];
 server.on("connection", (socket) => {
   console.log("a new connection to the server!");
 
+  const clientId = clients.length + 1;
+
+  socket.write(`id-${clientId}`);
+
   socket.on("data", (data) => {
-    clients.map((s) => {
-      s.write(data);
+    clients.map((client) => {
+      const dataString = data.toString("utf-8");
+      const id = dataString.substring(0, dataString.indexOf("-"));
+      const message = dataString.substring(dataString.indexOf("-message-") + 9);
+
+      client.socket.write(`> User ${id}: ${message}`);
     });
   });
 
-  clients.push(socket);
+  clients.push({ id: clientId.toString(), socket });
 
   socket.on("error", (err) => {
     console.log("one connection closed!");
