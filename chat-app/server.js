@@ -5,9 +5,14 @@ const server = net.createServer();
 const clients = [];
 
 server.on("connection", (socket) => {
-  console.log("a new connection to the server!");
-
   const clientId = clients.length + 1;
+
+  console.log(`User ${clientId} connected to the server!`);
+
+  // Broadcasting a message to everyone when someone enters the chat room
+  clients.forEach((client) => {
+    client.socket.write(`User ${clientId} joined!`);
+  });
 
   socket.write(`id-${clientId}`);
 
@@ -24,7 +29,11 @@ server.on("connection", (socket) => {
   clients.push({ id: clientId.toString(), socket });
 
   socket.on("error", (err) => {
-    console.log("one connection closed!");
+    // Broadcasting a message to everyone when someone leaves the chat room
+    clients.map((client) => {
+      client.socket.write(`User ${clientId} left!`);
+    });
+    console.log(`${clientId} closed the connection!`);
   });
 });
 
