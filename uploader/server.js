@@ -4,17 +4,27 @@ const fs = require("node:fs/promises");
 const server = net.createServer(() => {});
 
 server.on("connection", (socket) => {
-  console.log("New connection");
+  console.log("New connection!");
+
+  let fileHandle, fileStream;
 
   socket.on("data", async (data) => {
-    const fileHandle = await fs.open("storage/test.txt", "w");
-    const fileStream = fileHandle.createWriteStream();
+    fileHandle = await fs.open("storage/test.txt", "w");
+    fileStream = fileHandle.createWriteStream();
 
     // Writing to our destination file
     fileStream.write(data);
   });
+
+  socket.on("end", () => {
+    console.log("connection ended!");
+
+    fileHandle.close();
+  });
 });
 
 server.listen(5050, "::1", () => {
-  console.log(`Uploader server is running on ${server.address()}`);
+  console.log(
+    `Uploader server is running on ${JSON.stringify(server.address())}`
+  );
 });

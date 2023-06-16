@@ -10,4 +10,10 @@ const socket = net.createConnection({ port: 5050, host: "::1" }, async () => {
   fileStream.on("data", (data) => {
     socket.write(data);
   });
+
+  fileStream.on("end", () => {
+    console.log("Done uploading!");
+    fileHandle.close();
+    socket.end();
+  });
 });
