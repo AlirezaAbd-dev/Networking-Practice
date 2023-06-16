@@ -6,25 +6,25 @@ const server = net.createServer(() => {});
 server.on("connection", async (socket) => {
   console.log("New connection!");
 
-  let fileHandle, fileStream;
+  let fileHandle, fileWriteStream;
 
   socket.on("data", async (data) => {
     let buff = true;
     if (!fileHandle) {
       fileHandle = await fs.open("storage/test.txt", "w");
-      fileStream = fileHandle.createWriteStream();
+      fileWriteStream = fileHandle.createWriteStream();
 
       // Writing to our destination file
-      buff = fileStream.write(data);
+      buff = fileWriteStream.write(data);
     } else {
-      buff = fileStream.write(data);
+      buff = fileWriteStream.write(data);
     }
 
     if (!buff) {
       socket.pause();
     }
 
-    fileStream.on("drain", () => {
+    fileWriteStream.on("drain", () => {
       socket.resume();
     });
   });

@@ -4,22 +4,22 @@ const fs = require("node:fs/promises");
 const socket = net.createConnection({ port: 5050, host: "::1" }, async () => {
   const filePath = "./text.txt";
   const fileHandle = await fs.open(filePath, "r");
-  const fileStream = fileHandle.createReadStream();
+  const fileReadStream = fileHandle.createReadStream();
 
   //   Readeing from the source file
-  fileStream.on("data", (data) => {
+  fileReadStream.on("data", (data) => {
     const buff = socket.write(data);
 
     if (!buff) {
-      fileStream.pause();
+      fileReadStream.pause();
     }
 
     socket.on("drain", () => {
-      fileStream.resume();
+      fileReadStream.resume();
     });
   });
 
-  fileStream.on("end", () => {
+  fileReadStream.on("end", () => {
     console.log("Done uploading!");
     fileHandle.close();
     socket.end();
