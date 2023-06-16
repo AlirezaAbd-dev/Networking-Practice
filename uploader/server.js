@@ -8,7 +8,6 @@ server.on("connection", async (socket) => {
 
   let fileHandle, fileWriteStream;
 
-  console.time("time");
   socket.on("data", async (data) => {
     let buff = true;
     if (!fileHandle) {
@@ -48,10 +47,18 @@ server.on("connection", async (socket) => {
 
   socket.on("end", () => {
     console.log("connection ended!");
-    console.log(fileWriteStream.listenerCount("drain"));
     fileHandle.close();
     socket.destroy();
-    console.timeEnd("time");
+  });
+
+  socket.on("error", (err) => {
+    fileHandle.close();
+    socket.destroy();
+    if (err.code === "ECONNRESET") {
+      console.log("connection closed!");
+    } else {
+      console.log(err);
+    }
   });
 });
 
