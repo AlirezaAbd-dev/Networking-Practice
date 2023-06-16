@@ -9,8 +9,6 @@ const socket = net.createConnection({ port: 5050, host: "::1" }, async () => {
   const fileHandle = await fs.open(filePath, "r");
   const fileReadStream = fileHandle.createReadStream();
 
-  socket.setMaxListeners(100000);
-
   socket.write(`fileName: ${fileName}-------`);
 
   //   Readeing from the source file
@@ -28,7 +26,6 @@ const socket = net.createConnection({ port: 5050, host: "::1" }, async () => {
 
   fileReadStream.on("end", () => {
     console.log("Done uploading!");
-
     fileHandle.close();
     socket.end();
   });

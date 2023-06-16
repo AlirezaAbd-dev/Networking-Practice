@@ -8,6 +8,7 @@ server.on("connection", async (socket) => {
 
   let fileHandle, fileWriteStream;
 
+  console.time("time");
   socket.on("data", async (data) => {
     let buff = true;
     if (!fileHandle) {
@@ -15,12 +16,16 @@ server.on("connection", async (socket) => {
       // Because the data will be recieved one after the other and the file isn't open yet
       socket.pause();
 
+      // FileName header
       const indexOfDivider = data.indexOf("-------");
       const fileName = data.subarray(10, indexOfDivider).toString("utf-8");
 
       fileHandle = await fs.open(`storage/${fileName}`, "w");
       fileWriteStream = fileHandle.createWriteStream();
 
+      fileWriteStream.setMaxListeners(100000);
+
+      // Discard the header
       const indexOfData = data.indexOf("-------") + 7;
 
       // Writing to our destination file
@@ -43,8 +48,10 @@ server.on("connection", async (socket) => {
 
   socket.on("end", () => {
     console.log("connection ended!");
-
+    console.log(fileWriteStream.listenerCount("drain"));
     fileHandle.close();
+    socket.destroy();
+    console.timeEnd("time");
   });
 });
 
