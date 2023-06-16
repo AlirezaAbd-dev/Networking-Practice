@@ -10,6 +10,7 @@ server.on("connection", (socket) => {
     const fileHandle = await fs.open("storage/test.txt", "w");
     const fileStream = fileHandle.createWriteStream();
 
+    // Writing to our destination file
     fileStream.write(data);
   });
 });
