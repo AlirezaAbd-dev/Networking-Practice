@@ -8,7 +8,15 @@ const socket = net.createConnection({ port: 5050, host: "::1" }, async () => {
 
   //   Readeing from the source file
   fileStream.on("data", (data) => {
-    socket.write(data);
+    const buff = socket.write(data);
+
+    if (!buff) {
+      fileStream.pause();
+    }
+
+    socket.on("drain", () => {
+      fileStream.resume();
+    });
   });
 
   fileStream.on("end", () => {

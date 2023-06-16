@@ -3,17 +3,30 @@ const fs = require("node:fs/promises");
 
 const server = net.createServer(() => {});
 
-server.on("connection", (socket) => {
+server.on("connection", async (socket) => {
   console.log("New connection!");
 
   let fileHandle, fileStream;
 
   socket.on("data", async (data) => {
-    fileHandle = await fs.open("storage/test.txt", "w");
-    fileStream = fileHandle.createWriteStream();
+    let buff = true;
+    if (!fileHandle) {
+      fileHandle = await fs.open("storage/test.txt", "w");
+      fileStream = fileHandle.createWriteStream();
 
-    // Writing to our destination file
-    fileStream.write(data);
+      // Writing to our destination file
+      buff = fileStream.write(data);
+    } else {
+      buff = fileStream.write(data);
+    }
+
+    if (!buff) {
+      socket.pause();
+    }
+
+    fileStream.on("drain", () => {
+      socket.resume();
+    });
   });
 
   socket.on("end", () => {
