@@ -1,10 +1,12 @@
-const net = require("net");
+const net = require('net');
 
-const socket = net.createConnection({ host: "127.0.0.1", port: 3000 }, () => {
+const socket = net.createConnection({ host: '127.0.0.1', port: 3000 }, () => {
   const buff = Buffer.alloc(2);
-  buff.write("yo");
+  buff.write('Hi bro!');
 
   socket.write(buff);
+});
 
-  socket.destroy();
+socket.on('data', (data) => {
+  console.log(data.toString('utf-8'));
 });
